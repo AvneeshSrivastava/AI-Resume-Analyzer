@@ -1,13 +1,13 @@
 """
-Application entry point for the AI Resume Analyzer.
-
-This module creates and configures the FastAPI application instance.
+Application entry point for AI Resume Analyzer.
 """
 
 from fastapi import FastAPI
 
+from ai_resume_analyzer.core.config import settings
+
 app = FastAPI(
-    title="AI Resume Analyzer",
+    title=settings.app_name,
     description="AI-powered resume analysis platform built with FastAPI.",
-    version="0.1.0",
+    version=settings.app_version,
 )
