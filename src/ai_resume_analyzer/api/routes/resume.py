@@ -5,6 +5,8 @@ Handles HTTP requests for resume upload and delegates processing to services.
 """
 
 from fastapi import APIRouter, UploadFile, File, HTTPException
+from ai_resume_analyzer.services.resume_service import resume_service
+
 
 router = APIRouter(
     prefix="/resume",
@@ -26,7 +28,7 @@ async def upload_resume(file: UploadFile = File(...)):
 
     # Basic API-level validation
     if not file:
-        raise HTTPException(status_code=400, detail="No file uploaded")
+        raise HTTPException(status_code=400, detail="No file uploaded.")
 
     allowed_types = [
         "application/pdf",
@@ -39,8 +41,4 @@ async def upload_resume(file: UploadFile = File(...)):
             detail="Invalid file type. Only PDF and DOCX are supported."
         )
 
-    return {
-        "message": "File received successfully",
-        "filename": file.filename,
-        "content_type": file.content_type
-    }
+    return await resume_service.process_resume(file)
