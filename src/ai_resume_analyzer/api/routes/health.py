@@ -19,6 +19,7 @@ def health_check():
     Returns application health status.
     """
     return {
+        "status_code": "200",
         "status": "healthy",
         "app": settings.app_name,
         "version": settings.app_version,

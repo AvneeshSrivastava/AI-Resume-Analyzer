@@ -5,24 +5,23 @@ Contains business logic related to resume processing.
 """
 
 from fastapi import UploadFile
+from ai_resume_analyzer.services.document_extraction_service import (
+    document_extraction_service,
+)
+from ai_resume_analyzer.core.file_validator import FileValidator
 
 
 class ResumeService:
     """Service responsible for processing uploaded resumes.
     """
-
-    async def process_resume(self, file: UploadFile) -> dict:   
-        """
-        Process the uploaded resume file.
+    async def extract_resume_text(self,file: UploadFile) -> str:
+        """Extracts text from the uploaded resume file.
         Args:
             file (UploadFile): The uploaded resume file.
-        returns:
-            dict: A dictionary containing the processed resume data.
+        Returns:
+            str:  Extracted resume text.
         """
-        return{
-            "filename": file.filename,
-            "content_type": file.content_type,
-            "status": "received",
-            "message": "Resume successfully received for processing."
-            }
+        FileValidator.validate(file)
+        return await document_extraction_service.extract_text(file)
+    
 resume_service = ResumeService()

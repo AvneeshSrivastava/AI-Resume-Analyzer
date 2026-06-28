@@ -1,10 +1,11 @@
 """
-Resume upload API routes.
+Resume API routes.
 
-Handles HTTP requests for resume upload and delegates processing to services.
 """
 
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, File, UploadFile
+
+from ai_resume_analyzer.schemas.resume import ResumeExtractionResponse
 from ai_resume_analyzer.services.resume_service import resume_service
 
 
@@ -14,31 +15,21 @@ router = APIRouter(
 )
 
 
-@router.post("/upload")
-async def upload_resume(file: UploadFile = File(...)):
+@router.post("/upload", response_model=ResumeExtractionResponse,)
+async def upload_resume(file: UploadFile = File(...)) -> ResumeExtractionResponse:
     """
-    Upload a resume file (PDF/DOCX).
+    Upload a resume and extract its text.
 
     Args:
-        file: Uploaded resume file
+        file: Uploaded resume file.
 
     Returns:
-        Basic acknowledgement response
+         ResumeExtractionResponse containing the extracted text.
     """
 
-    # Basic API-level validation
-    if not file:
-        raise HTTPException(status_code=400, detail="No file uploaded.")
-
-    allowed_types = [
-        "application/pdf",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    ]
-
-    if file.content_type not in allowed_types:
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid file type. Only PDF and DOCX are supported."
-        )
-
-    return await resume_service.process_resume(file)
+    extracted_text = await resume_service.extract_resume_text(file)
+    
+    return ResumeExtractionResponse(
+        message="Resume processed successfully.",
+        extracted_text=extracted_text,
+    )
